@@ -36,7 +36,7 @@
 
         // MODELO DE DATOS
 
-        let mis_peliculas_iniciales = [
+        let mis_peliculas_iniciales = [ //DATO
             {titulo: "Superlópez",   director: "Javier Ruiz Caldera", "miniatura": "files/superlopez.png"},
             {titulo: "Jurassic Park", director: "Steven Spielberg", "miniatura": "files/jurassicpark.png"},
             {titulo: "Interstellar",  director: "Christopher Nolan", "miniatura": "files/interstellar.png"}
@@ -45,7 +45,7 @@
         localStorage.mis_peliculas = localStorage.mis_peliculas || JSON.stringify(mis_peliculas_iniciales);
 
         // VISTAS
-        const indexView = (peliculas) => {
+        const indexView = (peliculas) => { //Ver vídeo para entender el funcionamiento. DATO
             let i=0;
             let view = "";
 
@@ -59,21 +59,23 @@
                        ${peliculas[i].titulo || "<em>Sin título</em>"}
                    </div>
                    <div class="actions">
-                        <!--Insertar aquí botones de "Show" y "Delete"-->
-                       <button class="edit" data-my-id="${i}">editar</button>
+                       <button class="edit" data-my-id="${i}">Editar</button>
+                       <button class="show" data-my-id="${i}">Ver</button>
+                       <button class="delete" data-my-id="${i}">Borrar</button>
                     </div>
                 </div>\n`;
               i = i + 1;
             };
 
             view += `<div class="actions">
-                        <!--Insertar aquí botones de "Añadir" y "Reset"-->
+                        <button class="new" >Añadir</button>
+                        <button class="reset" >Reset</button>
                     </div>`;
 
             return view;
         };
 
-        const editView = (i, pelicula) => {
+        const editView = (i, pelicula) => { //DATO
             return `<h2>Editar Película </h2>
                 <div class="field">
                 Título <br>
@@ -100,66 +102,71 @@
                `;
         }
 
-        const showView = (pelicula) => {
-            // Completar: genera HTML con información de la película
-            // ...
-
+        const showView = (pelicula) => { //Vista de la información. Pasamos por como película la que marque el showContr a través del parámetro i 
             return `
              <p>
-
-             
-             
+                La película <b>${pelicula.titulo}</b> fue 
+                dirigida por <b>${pelicula.director}</b>!
              </p>
              <div class="actions">
                 <button class="index">Volver</button>
              </div>`;
         }
 
-        const newView = () => {
-            // Completar: genera formulario para crear nuevo quiz
-            // ...
-
-            return `<h2>Crear Película</h2>
-
-
-
-
-
+        const newView = () => { //Vista para crear una nueva película
+            return `<h2>Crear Película:</h2>
+            <div class="field">
+                Título <br>
+                <input  type="text" id="titulo" placeholder="Título">
+                </div>
+                <div class="field">
+                Director <br>
+                <input  type="text" id="director" placeholder="Director">
+                </div>
+                <div class="field">
+                Miniatura <br>
+                <input  type="text" id="miniatura" placeholder="URL de la miniatura">
+                </div>
                 <div class="actions">
+                    <button class="create">Crear</button>
                     <button class="index">Volver</button>
                 </div>`;
         }
         //CAMBIO PARA BORRAR
 
         // CONTROLADORES 
-        const indexContr = () => {
+        const indexContr = () => { //DATO
             let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
             document.getElementById('main').innerHTML = indexView(mis_peliculas);
         };
 
-        const showContr = (i) => {
-            // Completar: controlador que muestra la vista showView(pelicula)
-            // ...
+        const showContr = (i) => { 
+            let mis_peliculas = JSON.parse(localStorage.mis_peliculas); //Ver JSON y localstorage. Lo entendiste bien solo hace falta afianzarlo
+            document.getElementById('main').innerHTML = showView(mis_peliculas[i]);  //Mostramos la info de la película seleccionada en el index
 
         };
 
         const newContr = () => {
-            // Completar: controlador que muestra la vista newView()
-            // ...
+            let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
+            document.getElementById('main').innerHTML = newView(mis_peliculas); 
 
         };
 
         const createContr = () => {
-            // Completar: controlador que crea una película nueva en el modelo guardado en localStorage
-            // ...
+            let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
+            let nueva_pelicula =
+            {titulo: document.getElementById("titulo").value,  director: document.getElementById("director").value, "miniatura": document.getElementById("miniatura").value }; //Creamos un nuevo objeto con los datos introducidos en el newView()
+            mis_peliculas.push(nueva_pelicula); //.push = añade un nuevo dato a la cadena JSON. 
+            localStorage.mis_peliculas = JSON.stringify(mis_peliculas); //En el local storage guardabamos la nueva cadena
+            indexContr(); //Invocamos el menú inicial al terminar de crear una nueva película
         };
 
         const editContr = (i) => {
-            let pelicula = JSON.parse(localStorage.mis_peliculas)[i];
-            document.getElementById('main').innerHTML = editView(i, pelicula);
+            let pelicula = JSON.parse(localStorage.mis_peliculas)[i]; 
+            document.getElementById('main').innerHTML = editView(i, pelicula); //Comentar con la ayuda del index
         };
 
-        const updateContr = (i) => {
+        const updateContr = (i) => { //Cambiamos el dato de una película existente por otros al placer. Renombramos los atributos del objeto a través de las textbox del editView()
             let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
             mis_peliculas[i].titulo    = document.getElementById('titulo').value;
             mis_peliculas[i].director  = document.getElementById('director').value;
@@ -168,13 +175,20 @@
             indexContr();
         };
 
-        const deleteContr = (i) => {
-            // Completar:  controlador que actualiza el modelo borrando la película seleccionada
-            // Genera diálogo de confirmación: botón Aceptar devuelve true, Cancel false
+        const deleteContr = (i) => { //Entender en el vídeo en el que se explica.
+            let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
+            if(confirm(`Borrar ${mis_peliculas[i].titulo}`)){
+                mis_peliculas.splice(i,1);
+                localStorage.mis_peliculas = JSON.stringify(mis_peliculas);
+                indexContr();
+            };
         };
+        
 
-        const resetContr = () => {
-            // Completar:  controlador que reinicia el modelo guardado en localStorage con las películas originales
+        const resetContr = () => { 
+            let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
+            localStorage.mis_peliculas = JSON.stringify(mis_peliculas_iniciales); //Guardas en el localstorage el objeto inicial que es dato
+            indexContr();
             
         };
 
@@ -182,11 +196,15 @@
         const matchEvent = (ev, sel) => ev.target.matches(sel);
         const myId = (ev) => Number(ev.target.dataset.myId);
 
-        document.addEventListener('click', ev => {
+        document.addEventListener('click', ev => { //Ver vídeo para saber como funciona bien
             if      (matchEvent(ev, '.index'))  indexContr  ();
+            else if (matchEvent(ev, '.new'))    newContr    ();
+            else if (matchEvent(ev, '.create')) createContr ();
+            else if (matchEvent(ev, '.reset'))  resetContr  ();
             else if (matchEvent(ev, '.edit'))   editContr   (myId(ev));
             else if (matchEvent(ev, '.update')) updateContr (myId(ev));
-            // Completar añadiendo los controladores que faltan
+            else if (matchEvent(ev, '.show'))   showContr   (myId(ev));
+            else if (matchEvent(ev, '.delete')) deleteContr (myId(ev));
         })
         
         
